@@ -1,0 +1,11 @@
+name    'fc-fc_base'
+version '0.1.0'
+source 'https://github.com/ugarcia/fc-provision1.git'
+author 'Unai Garcia'
+license 'MIT'
+summary 'Frontcoder base module'
+description 'Frontcoder base module'
+project_page 'https://github.com/ugarcia/fc-provision1'
+
+## Add dependencies, if any:
+dependency 'fc/fc_nginx', '>= 0.1.0'

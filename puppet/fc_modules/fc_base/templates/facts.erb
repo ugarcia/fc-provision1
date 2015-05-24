@@ -1,0 +1,10 @@
+#!/bin/sh
+
+nginx_conf='/etc/nginx/nginx.conf'
+if [ -f "$nginx_conf" ]; then
+    nginx_user=$(grep 'user' "$nginx_conf" | sed 's/^user \(.*\);/\1/')
+    echo "nginx_daemon_user=$nginx_user"
+    echo "nginx_daemon_group=$(groups $nginx_user | awk '{ print $3 }')"
+    echo "nginx_cache_dir=/var/cache/nginx"
+fi
+echo "is_apache_installed=$(dpkg -s apache2 >/dev/null 2>&1 && echo -n true || echo -n false)"

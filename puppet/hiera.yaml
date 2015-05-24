@@ -1,0 +1,11 @@
+---
+:backends:
+  - yaml
+  - json
+:hierarchy:
+  - local
+  - "nodes/%{::hostname}"
+  - "environments/%{::environment}"
+  - common
+:yaml:
+  :datadir: "%{settings::configdir}/hieradata"
