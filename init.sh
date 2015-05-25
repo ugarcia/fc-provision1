@@ -23,6 +23,7 @@ function err()
 
 function install_packages()
 {
+    sudo apt-get update
     for p in "${PACKAGES[@]}"; do
         echo "Installing PACKAGE $p"
         res=$(sudo apt-get install --yes $p)

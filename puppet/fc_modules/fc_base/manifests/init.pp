@@ -51,28 +51,18 @@ class fc_base (
         group => $config['group'],
         mode => 0775
     }->
-    exec { 'apt-get_update':
-      command => 'apt-get update',
-      user => 'root'
-    }->
-    class { [
-        'fc_base::apache',
-        'fc_base::apt',
-        'fc_base::git',
-    ]: } ->     
-    class { [
-        'fc_base::mysql',
-        'fc_base::php',
-    ]: } ->   
-    class { [
-        'fc_base::nginx',
-    ]: } ->       
-    class { [
-        'fc_base::wordpress',
-    ]: } ->  
-    class { [
-        'fc_base::nodejs',
-        'fc_base::bower',
-        'fc_base::grunt',
-    ]: }      
+    # exec { 'apt-get_update':
+    #   command => 'apt-get update',
+    #   user => 'root'
+    # }->
+    class { 'fc_base::apache': } ->
+    class { 'fc_base::apt': } ->
+    class { 'fc_base::git': } ->
+    class { 'fc_base::mysql': } ->
+    class { 'fc_base::php': } ->
+    class { 'fc_base::wordpress': } ->
+    class { 'fc_base::nodejs': } ->
+    class { 'fc_base::bower': } ->
+    class { 'fc_base::grunt': } ->
+    class { 'fc_base::nginx': }   
 }
