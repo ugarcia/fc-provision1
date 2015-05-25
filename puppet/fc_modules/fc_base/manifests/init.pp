@@ -24,7 +24,7 @@
 # === Examples
 #
 #  class { fc_base:
-#    servers => [ 'pool.ntp.org', 'ntp.local.company.com' ],
+#    class { 'fc_base::nginx': },
 #  }
 #
 # === Authors
@@ -35,40 +35,36 @@
 #
 # Copyright 2015.
 #
-class fc_base {
-    class { 'fc_nginx': }
-}
-
-class fc_base::setup(
-    $disable_apache = true
+class fc_base (
+    $config = {}
 ) {
-    require fc_base
 
-    class { 'locales':
-        locales        => ['en_US.UTF-8 UTF-8'],
-        default_locale => 'en_US.UTF-8'
+    Exec { 
+        path => "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin",
+        user  => $config['user'],
+        group  => $config['group']       
     }
 
-    ensure_packages(['build-essential', 'vim', 'curl'])
-
-    file { "/etc/profile.d/default_editor.sh":
-        ensure  => file,
-        content => 'export EDITOR=vim; export VISUAL=vim',
-        mode    => '0755'
-    }
-
-    require fc_base::facts
-
-    if ($disable_apache == true) and ($::is_apache_installed == 'true') {
-        service { 'disable apache2':
-            name   => 'apache2',
-            ensure => stopped
-        }->
-        package {
-            'apache2': ensure => purged;
-            'apache2-bin': ensure => purged;
-            'apache2-data': ensure => purged;
-            'apache2.2-common': ensure => purged;
-        }
-    }
+    file {$config['folders']:
+        ensure => directory,
+        owner => $config['user'],
+        group => $config['group'],
+        mode => 0775
+    }->
+    exec { 'apt-get_update':
+      command => 'apt-get update',
+      user => 'root'
+    }->
+    class { [
+        'fc_base::apache',
+        'fc_base::apt',
+        'fc_base::git',
+        'fc_base::mysql',
+        'fc_base::php',
+        'fc_base::nginx',
+        'fc_base::wordpress',
+        'fc_base::nodejs',
+        'fc_base::bower',
+        'fc_base::grunt',
+    ]: }      
 }

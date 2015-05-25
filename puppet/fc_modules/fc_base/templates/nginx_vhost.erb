@@ -1,0 +1,87 @@
+server {
+        listen 80;
+        root <%= @vhost['root'] %>;
+        index <%= @vhost['index'] %>;
+        server_name <%= @vhost['domain'] %>;
+
+        access_log <%= @config['logs'] %>/<%= @vhost['domain'] %>.access.log;
+        error_log <%= @config['logs'] %>/<%= @vhost['domain'] %>.error.log;
+
+<% @vhost['headers'].each do |header| -%>
+        add_header <%= header %>;
+<% end -%>
+
+<% @vhost['proxies'].each do |proxy| -%>
+        location <%= proxy['origin'] %> {
+            proxy_pass <%= proxy['target'] %>;
+        }
+<% end -%>
+
+        location ~ \.(js|css|jpg|jpeg|png|giff|svg|woff|woff2|ttf|otf|eot)$ {
+                try_files $uri $uri/ =404;
+                break;
+        }
+
+        location / {
+            try_files $uri $uri/ /<%= @vhost['index'] %>?$args;
+        }
+
+<% if @vhost['fastcgi'] -%>
+        location ~ \.*.php$ {
+            include fastcgi_params;
+            fastcgi_split_path_info ^(.+\.php)(.*)$;
+            fastcgi_pass <%= @vhost['fastcgi'] %>;
+            fastcgi_intercept_errors on;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+<% end -%>
+}
+
+server {
+        listen 443;
+        server_name <%= @vhost['domain'] %>;
+        root <%= @vhost['root'] %>;
+        index <%= @vhost['index'] %>;
+
+        access_log <%= @config['logs'] %>/<%= @vhost['domain'] %>.access.log;
+        error_log <%= @config['logs'] %>/<%= @vhost['domain'] %>.error.log;
+
+<% @vhost['headers'].each do |header| -%>
+        add_header <%= header %>;
+<% end -%>
+
+<% @vhost['proxies'].each do |proxy| -%>
+        location <%= proxy['origin'] %> {
+            proxy_pass <%= proxy['target'] %>;
+        }
+<% end -%>
+
+        ssl on;
+        ssl_certificate <%= @vhost['ssl']['certificate'] %>;
+        ssl_certificate_key <%= @vhost['ssl']['key'] %>;
+
+        ssl_session_timeout 5m;
+
+        ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
+        ssl_prefer_server_ciphers on;
+
+        location ~ \.(js|css|jpg|jpeg|png|giff|svg|woff|woff2|ttf|otf|eot)$ {
+                try_files $uri $uri/ =404;
+                break;
+        }
+
+        location / {
+            try_files $uri $uri/ /<%= @vhost['index'] %>?$args;
+        }
+
+<% if @vhost['fastcgi'] -%>
+        location ~ \.*.php$ {
+            include fastcgi_params;
+            fastcgi_split_path_info ^(.+\.php)(.*)$;
+            fastcgi_pass <%= @vhost['fastcgi'] %>;
+            fastcgi_intercept_errors on;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+<% end -%>
+}

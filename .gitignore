@@ -1,6 +1,5 @@
 puppet/.librarian/
 puppet/.tmp/
 puppet/modules/
-puppet/Puppetfile
 puppet/Puppetfile.lock
 puppet/.gitignore

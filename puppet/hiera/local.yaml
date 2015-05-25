@@ -1,0 +1,123 @@
+fc_base::config:
+    user: unai
+    group: www-data
+    folders:
+        - '/home/unai/Projects'
+        - '/home/unai/Projects/Frontcoder'
+        - '/home/unai/Projects/Frontcoder/src'
+        - '/home/unai/Projects/Frontcoder/src/fc_web1'
+        - '/home/unai/Projects/Frontcoder/src/fc_cms1'
+
+fc_base::apache::config:
+    disabled: true
+
+fc_base::git::config:
+    user: unai
+    email: unai.gg77@gmail.com
+    repositories:
+        - folder: '/home/unai/Projects/Frontcoder/src'
+          name: 'fc_web1'
+          url: 'git@github.com:ugarcia/fc-web1.git'
+        - folder: '/home/unai/Projects/Frontcoder/src'
+          name: 'fc_cms1'
+          url: 'git@github.com:ugarcia/fc-cms1.git'
+
+fc_base::mysql::config:
+    users:
+        - name: "fc_wordpress@%"
+          password: "fc_wordpress"
+    databases:
+        - name: fc_wordpress
+          charset: utf8
+    grants:
+        - privileges: ['ALL']
+          table: 'fc_wordpress.*'
+          user: 'fc_wordpress@%'
+
+fc_base::php::config:
+    fpm:
+        pools:
+            - name: fc_cms1
+              user: unai
+              group: "www-data"
+              listen: "/var/run/php5-fpm.fc_cms1.php.sock"
+              listen_owner: "www-data"
+              listen_owner: "www-data"
+              error_log: "/var/log/php/fc_cms1.php-fpm.log"
+
+    xdebug:
+        - 'set .anon/zend_extension "xdebug.so"'
+        - 'set .anon/xdebug.remote_enable 1'
+        - 'set .anon/xdebug.remote_port 9090'
+        - 'set .anon/xdebug.profiler_enable 1'
+        - 'set .anon/xdebug.profiler_output_dir "/temp"'           
+        - 'set .anon/xdebug.idekey "PHPSTORM"'            
+        - 'set .anon/xdebug.max_nesting_level 250'            
+        - 'set .anon/xdebug.remote_enable 1'            
+        - 'set .anon/xdebug.remote_enable 1'            
+
+fc_base::wordpress::config:
+    wp_owner: unai
+    wp_group: 'www-data'
+    create_db: false    
+    db_name: fc_wordpress      
+    db_user: fc_wordpress
+    db_password: fc_wordpress
+    wp_table_prefix: fc_wp_
+    install_dir: '/home/unai/Projects/Frontcoder/tmp_wordpress'
+    version: 'latest'
+    wp_debug: true
+    target_dir: '/home/unai/Projects/Frontcoder/src/fc_cms1'
+    plugins:
+        - name: 'json-api'
+          url: 'https://downloads.wordpress.org/plugin/json-api.1.1.1.zip'
+        - name: 'wordpress-importer'
+          url: 'https://downloads.wordpress.org/plugin/wordpress-importer.0.6.1.zip'
+
+fc_base::nodejs::config:
+    version: '0.12'
+    source: 'https://deb.nodesource.com'
+    packages:
+        global:
+            - 'coffee-script'
+            - 'less'
+            - 'bower'
+            - 'uglifyjs'
+            - 'grunt-cli'
+        scoped:
+            - '/home/unai/Projects/Frontcoder/src/fc_web1'
+
+fc_base::bower::config:
+    folders:
+        - '/home/unai/Projects/Frontcoder/src/fc_web1'
+
+fc_base::grunt::config:
+    folders:
+        - '/home/unai/Projects/Frontcoder/src/fc_web1'
+
+fc_base::nginx::config:
+    logs: '/var/log/nginx'
+    vhosts:
+        - name: 'fc_web1'
+          domain: 'frontcoder.local'
+          root: '/home/unai/Projects/Frontcoder/src/fc_web1'
+          index: 'index.html'
+          headers: []
+          ssl:
+              certificate: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+              key: '/etc/ssl/private/ssl-cert-snakeoil.key'
+          proxies:
+              - origin: '/cms_api'
+                target: 'https://cms.frontcoder.local/'
+        - name: 'fc_cms1'
+          domain: 'cms.frontcoder.local'
+          root: '/home/unai/Projects/Frontcoder/src/fc_cms1'
+          index: 'index.php'
+          headers:
+              - "Access-Control-Allow-Origin 'https://frontcoder.local'"
+              - "Access-Control-Allow-Credentials true"
+          ssl:
+              certificate: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+              key: '/etc/ssl/private/ssl-cert-snakeoil.key'
+          proxies: []
+          fastcgi: 'unix:/var/run/php5-fpm.fc_cms1.php.sock'
