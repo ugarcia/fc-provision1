@@ -14,6 +14,7 @@ class fc_base::nodejs(
 
     exec { 'install_nodejs' :
         command => "curl -sL ${node_src}/setup_${node_v} | sudo bash -",
+        user => "root",   
         unless => [ "test -f /usr/bin/node" ]
     }->
 

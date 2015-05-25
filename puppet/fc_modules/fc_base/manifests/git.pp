@@ -6,10 +6,14 @@ class fc_base::git(
 
     include git
 
-    git::config { 
-        'user.name': value => $config['user'];
-        'user.email': value => $config['email']
-    }
+    git::config { 'user.name':
+        value   => $config['user'],
+        user    => $config['user'],
+    } ->
+    git::config { 'user.email':
+        value   => $config['email'],
+        user    => $config['user'],
+    }          
 
     $aRepositories.each |$repo| {
 

@@ -56,9 +56,9 @@ function apply_puppet()
     sudo puppet apply --confdir="$PUPPET_SRC_HOME" --verbose --debug --trace "$PUPPET_SRC_MAIN_MANIFEST"    
 }
 
-# install_packages
-# install_gems
-# install_modules
+install_packages
+install_gems
+install_modules
 apply_puppet
 
 

@@ -59,10 +59,18 @@ class fc_base (
         'fc_base::apache',
         'fc_base::apt',
         'fc_base::git',
+    ]: } ->     
+    class { [
         'fc_base::mysql',
         'fc_base::php',
+    ]: } ->   
+    class { [
         'fc_base::nginx',
+    ]: } ->       
+    class { [
         'fc_base::wordpress',
+    ]: } ->  
+    class { [
         'fc_base::nodejs',
         'fc_base::bower',
         'fc_base::grunt',
